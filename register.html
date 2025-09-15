@@ -23,11 +23,17 @@
 
         .form-container {
             transition: all 0.3s ease-in-out;
+            background: rgba(12, 17, 30, 0.7);
+            /* Dark, semi-transparent background */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border-radius: 20px;
         }
 
         .form-container:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.45);
         }
 
         .party-radio:checked+label {
@@ -46,9 +52,13 @@
         input[type="email"],
         textarea,
         select {
-            background-color: #1a2235;
+            background: rgba(255, 255, 255, 0.05);
             color: #e2e8f0;
-            border-color: #2d3748;
+            border-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-radius: 8px;
         }
 
         input::placeholder,
@@ -62,10 +72,28 @@
             border-color: #142147;
             box-shadow: 0 0 0 3px rgba(20, 33, 71, 0.3);
         }
+
+        select option {
+            background: #0c111e;
+            color: #e2e8f0;
+        }
+
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('break_the_script.png.jpeg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
     </style>
 </head>
 
-<body class="bg-[#0c111e] text-gray-200">
+<body class="text-gray-200">
+    <div class="background-image"></div>
 
     <!-- Tagline Banner -->
     <div class="bg-[#142147] text-white py-4 text-center shadow-md overflow-x-auto whitespace-nowrap">
@@ -83,7 +111,7 @@
                 </div>
                 <div class="text-center">
                     <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">NSU Debate Club</h1>
-                    <h2 class="text-2xl md:text-3xl font-semibold mt-2">Voice Your Verdict </h2>
+                    <h2 class="text-2xl md:text-3xl font-semibold mt-2">Break The Script </h2>
                 </div>
                 <div class="mt-4 md:mt-0">
 
@@ -98,7 +126,7 @@
         <!-- Registration Form Section -->
         <section id="registration-form">
             <div
-                class="form-container p-8 md:p-12 rounded-xl shadow-lg border border-blue-400 max-w-4xl mx-auto bg-[#0c111e]">
+                class="form-container p-8 md:p-12 rounded-xl shadow-lg border border-blue-400 max-w-4xl mx-auto">
                 <h3 class="text-3xl font-bold text-center mb-8 text-white">Candidate Registration</h3>
                 <!-- 
                     IMPORTANT: Replace the "action" URL below with your Google Form's action URL.
@@ -366,35 +394,13 @@
         </div>
     </footer>
 
-    <!-- Success Message Modal -->
-    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
-        <div class="bg-[#142147] border border-gray-700 rounded-lg shadow-2xl p-8 max-w-sm mx-auto text-center transform transition-all scale-95 opacity-0"
-            id="success-modal-content">
-            <div class="text-green-400 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" viewBox="0 0 20 20"
-                    fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clip-rule="evenodd" />
-                </svg>
-            </div>
-            <h4 class="text-2xl font-bold text-white mb-2">Registration Successful!</h4>
-            <p class="text-gray-300 mb-6">Thank you for your application. Please proceed to the Interaction Booth for
-                the next step.</p>
-            <button id="close-modal-btn"
-                class="bg-[#142147] text-white font-bold py-2 px-6 rounded-lg hover:bg-[#0c111e] focus:outline-none focus:ring-4 focus:ring-[#142147]">
-                Close
-            </button>
-        </div>
-    </div>
-
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('recruitmentForm');
-            const successModal = document.getElementById('success-modal');
-            const successModalContent = document.getElementById('success-modal-content');
-            const closeModalBtn = document.getElementById('close-modal-btn');
+            // const successModal = document.getElementById('success-modal');
+            // const successModalContent = document.getElementById('success-modal-content');
+            // const closeModalBtn = document.getElementById('close-modal-btn');
             // IMPORTANT: PASTE YOUR GOOGLE FORM ACTION URL HERE
             const googleFormURL = 'https://docs.google.com/forms/d/e/1FAIpQLSc1ohHMB8nDx02e5JffuLljwTPjESo8VHm2iCyuODq4GHbuCg/formResponse';
 
@@ -441,14 +447,8 @@
                         // Even with an error, we can show the success modal to the user, as 'no-cors' often causes a benign error.
                     });
 
-                    // --- Show Success Modal ---
-                    successModal.classList.remove('hidden');
-                    setTimeout(() => {
-                        successModalContent.classList.remove('scale-95', 'opacity-0');
-                    }, 10);
-
-                    form.reset();
-                    requiredFields.forEach(field => field.classList.remove('border-red-500'));
+                    // --- Redirect to home page ---
+                    window.location.href = 'index.html?registered=true';
 
                 } else {
                     console.log('Form is invalid. Please fill all required fields.');
@@ -460,19 +460,19 @@
             });
 
             // --- Modal Controls ---
-            function closeModal() {
-                successModalContent.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => {
-                    successModal.classList.add('hidden');
-                }, 300);
-            }
+            // function closeModal() {
+            //     successModalContent.classList.add('scale-95', 'opacity-0');
+            //     setTimeout(() => {
+            //         successModal.classList.add('hidden');
+            //     }, 300);
+            // }
 
-            closeModalBtn.addEventListener('click', closeModal);
-            successModal.addEventListener('click', function (event) {
-                if (event.target === successModal) {
-                    closeModal();
-                }
-            });
+            // closeModalBtn.addEventListener('click', closeModal);
+            // successModal.addEventListener('click', function (event) {
+            //     if (event.target === successModal) {
+            //         closeModal();
+            //     }
+            // });
         });
     </script>
 
