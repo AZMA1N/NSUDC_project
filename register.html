@@ -198,14 +198,14 @@
                         <!-- Facebook profile (optional) -->
                         <div class="md:col-span-2">
                             <label for="facebook" class="block text-sm font-medium text-gray-300 mb-1">Facebook profile</label>
-                            <input type="url" id="facebook" name="entry.822417478" placeholder="e.g., https://www.facebook.com/AZMA1N/"
+                            <input type="url" id="facebook" name="entry.822417478" placeholder="e.g., https://www.facebook.com/AZMA1N/" required aria-required="true"
                                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#142147] focus:border-[#142147] transition">
                             <p class="text-xs text-gray-400 mt-1"> Share a public profile link </p>
                         </div>
                         <!-- Prior extracurricular / club experience (added) -->
                         <div class="md:col-span-2">
                             <label for="prior_experience" class="block text-sm font-medium text-gray-300 mb-1">Do you have any prior experience in extracurricular activities or club involvement?</label>
-                            <textarea id="prior_experience" name="entry.2110509238" rows="3"
+                            <textarea id="prior_experience" name="entry.2110509238" rows="3" required aria-required="true"
                                 placeholder="Briefly describe any club roles, committees, or extracurricular work (or write N/A)"
                                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#142147] focus:border-[#142147] transition"></textarea>
                         </div>
@@ -213,16 +213,16 @@
                         <!-- Add this right after the questionnaire textarea div -->
                         <div class="md:col-span-2">
                             <label for="skills" class="block text-sm font-medium text-gray-300 mb-1">Notable Skills: (if none write N/A)</label>
-                            <textarea id="skills" name="entry.808969974" rows="2"
-                                placeholder="List any relevant skills (e.g., gfx design, IT, crafting, etc.)" required
+                            <textarea id="skills" name="entry.808969974" rows="2" required aria-required="true"
+                                placeholder="List any relevant skills (e.g., gfx design, IT, crafting, etc.)"
                                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#142147] focus:border-[#142147] transition"></textarea>
                         </div>
                         <!-- Questionnaire -->
                         <div class="md:col-span-2">
                             <label for="questionnaire" class="block text-sm font-medium text-gray-300 mb-1">Why do you
                                 want to join the NSU Debate Club?</label>
-                            <textarea id="questionnaire" name="entry.192450253" rows="4"
-                                placeholder="Share your motivation, interests, or any relevant experience." required
+                            <textarea id="questionnaire" name="entry.192450253" rows="4" required aria-required="true"
+                                placeholder="Share your motivation, interests, or any relevant experience."
                                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#142147] focus:border-[#142147] transition"></textarea>
                         </div>
 
@@ -440,21 +440,41 @@
 
                 requiredFields.forEach(field => {
                     let fieldIsValid = true;
-                    if ((field.type === 'text' || field.type === 'email' || field.type === 'textarea' || field.type === 'select-one') && field.value.trim() === '') {
-                        fieldIsValid = false;
-                    } else if (field.type === 'radio') {
-                        const radioGroup = form.elements[field.name];
-                        if (!radioGroup.value) {
+
+                    // Handle different element types
+                    const tag = field.tagName.toLowerCase();
+                    if (tag === 'input') {
+                        const type = field.type;
+                        if ((type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'password') && field.value.trim() === '') {
                             fieldIsValid = false;
+                        }
+                        if (field.pattern && field.value.trim() !== '') {
+                            const re = new RegExp('^' + field.pattern + '$');
+                            if (!re.test(field.value.trim())) fieldIsValid = false;
+                        }
+                    } else if (tag === 'textarea') {
+                        if (field.value.trim() === '') fieldIsValid = false;
+                    } else if (tag === 'select') {
+                        if (!field.value || field.value === '') fieldIsValid = false;
+                    }
+
+                    // radio/checkbox groups: ensure one is checked
+                    if (field.type === 'radio' || field.type === 'checkbox') {
+                        const group = form.querySelectorAll(`[name="${field.name}"]`);
+                        if (group.length > 0) {
+                            const anyChecked = Array.from(group).some(g => g.checked);
+                            if (!anyChecked) fieldIsValid = false;
                         }
                     }
 
                     if (!fieldIsValid) {
                         isValid = false;
                         field.classList.add('border-red-500');
+                        field.setAttribute('aria-invalid', 'true');
                         if (!firstInvalidField) firstInvalidField = field;
                     } else {
                         field.classList.remove('border-red-500');
+                        field.removeAttribute('aria-invalid');
                     }
                 });
 
@@ -479,7 +499,6 @@
                     console.log('Form is invalid. Please fill all required fields.');
                     if (firstInvalidField) {
                         firstInvalidField.focus();
-
                     }
                 }
             });
@@ -513,12 +532,34 @@
                 const requiredInStep1 = step1.querySelectorAll('[required]');
                 let valid = true;
                 requiredInStep1.forEach(f => {
-                    if (f.type === 'checkbox' || f.type === 'radio') return; // skip
-                    if (!f.value || f.value.trim() === '') {
-                        f.classList.add('border-red-500');
+                    let fieldIsValid = true;
+                    const tag = f.tagName.toLowerCase();
+
+                    // skip group inputs here (if any) and handle via other logic
+                    if (f.type === 'checkbox' || f.type === 'radio') return;
+
+                    if (tag === 'input') {
+                        const type = f.type;
+                        if ((type === 'text' || type === 'email' || type === 'tel' || type === 'url' || type === 'number' || type === 'password') && f.value.trim() === '') {
+                            fieldIsValid = false;
+                        }
+                        if (f.pattern && f.value.trim() !== '') {
+                            const re = new RegExp('^' + f.pattern + '$');
+                            if (!re.test(f.value.trim())) fieldIsValid = false;
+                        }
+                    } else if (tag === 'textarea') {
+                        if (f.value.trim() === '') fieldIsValid = false;
+                    } else if (tag === 'select') {
+                        if (!f.value || f.value === '') fieldIsValid = false;
+                    }
+
+                    if (!fieldIsValid) {
                         valid = false;
+                        f.classList.add('border-red-500');
+                        f.setAttribute('aria-invalid', 'true');
                     } else {
                         f.classList.remove('border-red-500');
+                        f.removeAttribute('aria-invalid');
                     }
                 });
                 return valid;
