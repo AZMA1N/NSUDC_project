@@ -487,13 +487,14 @@
                         mode: 'no-cors' // Important: this prevents CORS errors, but you won't get a success response back.
                     }).then(() => {
                         console.log('Form data sent to Google Forms.');
+                        // --- Redirect to home page after submission ---
+                        window.location.href = 'index.html?registered=true';
                     }).catch(error => {
                         console.error('Error sending form data:', error);
                         // Even with an error, we can show the success modal to the user, as 'no-cors' often causes a benign error.
+                        // Redirect anyway to provide a consistent user experience
+                        window.location.href = 'index.html?registered=true';
                     });
-
-                    // --- Redirect to home page ---
-                    window.location.href = 'index.html?registered=true';
 
                 } else {
                     console.log('Form is invalid. Please fill all required fields.');
