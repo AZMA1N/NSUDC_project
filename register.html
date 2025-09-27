@@ -117,7 +117,8 @@
 
         <!-- Registration Form Section -->
         <section id="registration-form">
-            <div
+            <!-- Registration Form Container -->
+            <div id="registration-form-container"
                 class="form-container p-8 md:p-12 rounded-xl shadow-lg border border-blue-400 max-w-4xl mx-auto">
                 <h3 class="text-3xl font-bold text-center mb-8 text-white">Candidate Registration</h3>
                 <!-- 
@@ -349,6 +350,28 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Registration Closed Message (hidden by default) -->
+            <div id="registration-closed-container" class="hidden form-container p-8 md:p-12 rounded-xl shadow-lg border border-red-400 max-w-4xl mx-auto text-center">
+                <div class="mb-6">
+                    <svg class="mx-auto h-16 w-16 text-red-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                </div>
+                <h3 class="text-3xl font-bold mb-4 text-white">Registration Closed</h3>
+                <p class="text-lg text-gray-300 mb-6">Thank you for your interest in joining the NSU Debate Club!</p>
+                <p class="text-gray-400 mb-8">The registration period has ended. Please follow our social media channels for updates on future opportunities.</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="https://www.facebook.com/NSUDC93" target="_blank" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition">
+                        Follow on Facebook
+                    </a>
+                    <a href="index.html" 
+                       class="bg-[#142147] hover:bg-[#0c111e] text-white font-bold py-2 px-6 rounded-lg transition">
+                        Back to Home
+                    </a>
+                </div>
+            </div>
         </section>
 
     </main>
@@ -421,6 +444,32 @@
 
 
     <script>
+        // Registration deadline check
+        document.addEventListener('DOMContentLoaded', function () {
+            // Format: 'YYYY-MM-DD HH:MM:SS' (24-hour format)
+            const REGISTRATION_DEADLINE = '2025-09-28 18:00:00';
+            
+            // Check if registration is still open
+            const now = new Date();
+            const deadline = new Date(REGISTRATION_DEADLINE);
+            const isRegistrationOpen = now < deadline;
+            
+            const formContainer = document.getElementById('registration-form-container');
+            const closedContainer = document.getElementById('registration-closed-container');
+            
+            if (isRegistrationOpen) {
+                // Show the registration form
+                formContainer.classList.remove('hidden');
+                closedContainer.classList.add('hidden');
+            } else {
+                // Show the closed message
+                formContainer.classList.add('hidden');
+                closedContainer.classList.remove('hidden');
+                return; // Exit early, don't initialize form
+            }
+        });
+        
+        // Form submission and step navigation (only runs if registration is open)
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('recruitmentForm');
             // const successModal = document.getElementById('success-modal');
